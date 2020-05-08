@@ -289,10 +289,7 @@ namespace AsyncResourcePool
         private void MakeResourceAvailable(TResource resource)
         {
             var resourceAvailableMessage = new ResourceAvailableMessage(resource);
-            if (!_messageHandler.Post(resourceAvailableMessage))
-            {
-                DisposeResource(resource);
-            }
+            _messageHandler.Post(resourceAvailableMessage);
         }
 
         private bool IsResourceExpired(TimestampedResource timestampedResource)
@@ -328,7 +325,11 @@ namespace AsyncResourcePool
         {
             Interlocked.Decrement(ref _numResources);
 
-            if (resource is IDisposable disposableResource)
+            if (resource is IAsyncDisposable asyncDisposableResource)
+            {
+                await asyncDisposableResource.DisposeAsync();
+            }
+            else if (resource is IDisposable disposableResource)
             {
                 await Task.Run(() => { disposableResource.Dispose(); });
             }
