@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
-    <Version>1.0.0</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <LangVersion>7.3</LangVersion>
-    <Title>AsyncResourcePool</Title>
-    <Authors>Andrew Harward</Authors>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>0</VersionSuffix>
+    <Title>Seismic.AsyncResourcePool</Title>
+    <PackageId>Seismic.AsyncResourcePool</PackageId>
+    <Authors>Andrew Harward, Danny Guinther</Authors>
     <Description>Thread-safe, non-blocking, managed pool of re-usable resources, with a specified minimum and optional maximum number of resources, and optional expiry time for resources to be cleaned up if not used for a time.</Description>
     <Copyright>Copyright 2019 (c) Andrew Harward. All rights reserved.</Copyright>
-    <RepositoryUrl>https://github.com/extremeandy/AsyncResourcePool</RepositoryUrl>
+    <RepositoryUrl>https://github.com/tdg5/AsyncResourcePool</RepositoryUrl>
     <PackageTags>resource pooling</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/extremeandy/AsyncResourcePool</PackageProjectUrl>
