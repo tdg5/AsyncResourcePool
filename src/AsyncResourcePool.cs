@@ -92,7 +92,7 @@ namespace AsyncResourcePool
                         {
                             Task.Run(async () =>
                             {
-                                await Task.Delay(_resourceCreationRetryInterval);
+                                await Task.Delay(_resourceCreationRetryInterval).ConfigureAwait(false);
                                 var nextAttemptNumber = createResourceFailedMessage.AttemptNumber + 1;
                                 _messageHandler.Post(new EnsureAvailableResourcesMessage(nextAttemptNumber));
                             });
@@ -109,7 +109,7 @@ namespace AsyncResourcePool
         {
             try
             {
-                await _messageHandler.Completion;
+                await _messageHandler.Completion.ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -146,7 +146,7 @@ namespace AsyncResourcePool
                             // Run the clean-up 10X as often as resources will expire. This will ensure that we
                             // keep the number of resources that have expired in the queue to a minimum.
                             const int frequency = 10;
-                            await Task.Delay(new TimeSpan(_resourcesExpireAfter.Value.Ticks / frequency), purgeCancellationToken);
+                            await Task.Delay(new TimeSpan(_resourcesExpireAfter.Value.Ticks / frequency), purgeCancellationToken).ConfigureAwait(false);
                             var purgeMessage = new PurgeExpiredResourcesMessage();
                             _messageHandler.Post(purgeMessage);
                         }
@@ -154,7 +154,7 @@ namespace AsyncResourcePool
 
                     try
                     {
-                        await _messageHandler.Completion;
+                        await _messageHandler.Completion.ConfigureAwait(false);
                     }
                     finally
                     {
@@ -256,7 +256,7 @@ namespace AsyncResourcePool
 
             try
             {
-                await Task.WhenAll(createResourceTasks);
+                await Task.WhenAll(createResourceTasks).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -274,7 +274,7 @@ namespace AsyncResourcePool
                 // waiting, another thread may read the incorrect value.
                 Interlocked.Increment(ref _numResources);
 
-                var resource = await resourceTask;
+                var resource = await resourceTask.ConfigureAwait(false);
 
                 MakeResourceAvailable(resource);
             }
@@ -327,18 +327,18 @@ namespace AsyncResourcePool
 
             if (resource is IAsyncDisposable asyncDisposableResource)
             {
-                await asyncDisposableResource.DisposeAsync();
+                await asyncDisposableResource.DisposeAsync().ConfigureAwait(false);
             }
             else if (resource is IDisposable disposableResource)
             {
-                await Task.Run(() => { disposableResource.Dispose(); });
+                await Task.Run(() => { disposableResource.Dispose(); }).ConfigureAwait(false);
             }
         }
 
         public async void Dispose()
         {
             _messageHandler.Complete();
-            await _messageHandler.Completion; // Even after we mark Complete, still need to finish processing.
+            await _messageHandler.Completion.ConfigureAwait(false); // Even after we mark Complete, still need to finish processing.
 
             // Clean up any remaining requests.
             while (_pendingResourceRequests.Count > 0)
